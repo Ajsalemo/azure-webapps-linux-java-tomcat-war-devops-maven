@@ -4,69 +4,68 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
 trigger:
-  - main
-  
-  variables:
-  
-    # Azure Resource Manager connection created during pipeline creation
-    azureSubscription: '356d35cd-1f15-4bf2-9708-70102712f85e'
-  
-    # Web app name
-    webAppName: 'ansalemo-tomcat-maven-devops'
-  
-    # Environment name
-    environmentName: 'ansalemo-tomcat-maven-devops'
-  
-    # Agent VM image name
-    vmImageName: 'ubuntu-latest'
-  
-  stages:
-  - stage: Build
-    displayName: Build stage
-    jobs:
-    - job: MavenPackageAndPublishArtifacts
-      displayName: Maven Package and Publish Artifacts
-      pool:
-        vmImage: $(vmImageName)
-  
-      steps:
-      - task: Maven@3
-        displayName: 'Maven Package'
-        inputs:
-          mavenPomFile: 'pom.xml'
-          jdkVersionOption: 1.17
-  
-      - task: CopyFiles@2
-        displayName: 'Copy Files to artifact staging directory'
-        inputs:
-          SourceFolder: '$(System.DefaultWorkingDirectory)'
-          Contents: '**/target/*.?(war|jar)'
-          TargetFolder: $(Build.ArtifactStagingDirectory)
-  
-      - upload: $(Build.ArtifactStagingDirectory)
-        artifact: drop
-  
-  - stage: Deploy
-    displayName: Deploy stage
-    dependsOn: Build
-    condition: succeeded()
-    jobs:
-    - deployment: DeployLinuxWebApp
-      displayName: Deploy Linux Web App
-      environment: $(environmentName)
-      pool:
-        vmImage: $(vmImageName)
-      strategy:
-        runOnce:
-          deploy:
-            steps: 
-            - task: AzureCLI@2
-              displayName: 'Azure Web App Deploy: ansalemo-tomcat-maven-devops'
-              inputs:
-                azureSubscription: 'Ansalemo (4388fa06-bf66-4497-82c2-991ba75ecb97)'
-                scriptType: 'bash'
-                scriptLocation: 'inlineScript'
-                inlineScript: 'az webapp deploy --resource-group ansalemo-rg --name $(webAppName) --src-path $(Pipeline.Workspace)/drop/**/target/*.?(war|jar) --type war --async true'
-            
-  
-  
+- main
+
+variables:
+
+  # Azure Resource Manager connection created during pipeline creation
+  azureSubscription: '356d35cd-1f15-4bf2-9708-70102712f85e'
+
+  # Web app name
+  webAppName: 'ansalemo-tomcat-maven-devops'
+
+  # Environment name
+  environmentName: 'ansalemo-tomcat-maven-devops'
+
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+
+stages:
+- stage: Build
+  displayName: Build stage
+  jobs:
+  - job: MavenPackageAndPublishArtifacts
+    displayName: Maven Package and Publish Artifacts
+    pool:
+      vmImage: $(vmImageName)
+
+    steps:
+    - task: Maven@3
+      displayName: 'Maven Package'
+      inputs:
+        mavenPomFile: 'pom.xml'
+        jdkVersionOption: 1.17
+
+    - task: CopyFiles@2
+      displayName: 'Copy Files to artifact staging directory'
+      inputs:
+        SourceFolder: '$(System.DefaultWorkingDirectory)'
+        Contents: '**/target/*.?(war|jar)'
+        TargetFolder: $(Build.ArtifactStagingDirectory)
+
+    - upload: $(Build.ArtifactStagingDirectory)
+      artifact: drop
+
+- stage: Deploy
+  displayName: Deploy stage
+  dependsOn: Build
+  condition: succeeded()
+  jobs:
+  - deployment: DeployLinuxWebApp
+    displayName: Deploy Linux Web App
+    environment: $(environmentName)
+    pool:
+      vmImage: $(vmImageName)
+    strategy:
+      runOnce:
+        deploy:
+          steps: 
+          - task: AzureCLI@2
+            displayName: 'Azure Web App Deploy: ansalemo-tomcat-maven-devops'
+            inputs:
+              azureSubscription: 'Ansalemo (4388fa06-bf66-4497-82c2-991ba75ecb97)'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: 'az webapp deploy --resource-group ansalemo-rg --name $(webAppName) --src-path $(Pipeline.Workspace)/drop/**/target/*.?(war|jar) --type war --async true'
+          
+

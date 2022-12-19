@@ -66,6 +66,6 @@ stages:
               azureSubscription: 'Ansalemo (4388fa06-bf66-4497-82c2-991ba75ecb97)'
               scriptType: 'bash'
               scriptLocation: 'inlineScript'
-              inlineScript: 'az webapp deploy --resource-group ansalemo-rg --name $(webAppName) --src-path "$(Pipeline.Workspace)/drop/**/target/*.war" --type war --async true'
+              inlineScript: 'az webapp deploy --resource-group ansalemo-rg --name $(webAppName) --src-path "$(Pipeline.Workspace)/drop/target/azure-0.0.1-SNAPSHOT.war" --type war --async true'
           
 

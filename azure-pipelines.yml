@@ -30,10 +30,18 @@ stages:
       vmImage: $(vmImageName)
 
     steps:
+    - task: JavaToolInstaller@0
+      inputs:
+        versionSpec: '17'
+        jdkArchitectureOption: 'x64'
+        jdkSourceOption: 'PreInstalled'
+      displayName: 'Set Java version'
+
     - task: Bash@3
       inputs:
         targetType: 'inline'
         script: 'mvn package azure-webapp:deploy'
+      displayName: 'Maven Package and Deploy'
           
 
   

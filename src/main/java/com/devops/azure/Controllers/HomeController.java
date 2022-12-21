@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HomeController {
-    String message = "This is a war file from Azure DevOps pipelines with the Azure Maven plugin!";
+    String message = "This is a war file from GitHub Actions with Maven!";
 
     @GetMapping("/")
     public String index() {

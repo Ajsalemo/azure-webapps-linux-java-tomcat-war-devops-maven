@@ -43,11 +43,18 @@ jobs:
         with:
           name: java-app
 
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
+      - name: Azure Login
+        uses: azure/login@v1
         with:
-          app-name: 'ansalemo-ghactions-sb-war'
-          slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_93C5055D6E854ACA9AF66ECE8B7BC6F9 }}
-          package: '*.war'
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Web App with Azure CLI
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.43.0
+          inlineScript: |
+            az webapp deploy --resource-group "ansalemo-rg" --name "ansalemo-ghactions-sb-war" --src-path azure-0.0.1-SNAPSHOT.war --type war --async true
+          
+
+
+   
